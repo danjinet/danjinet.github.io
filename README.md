@@ -3,4 +3,5 @@ hi i am currently working on following projects
 - HCR on NCC architecture on DL
 - this project I make for my collage project
 - games
-    - namaste 
+    - changadar
+    - pyrun
