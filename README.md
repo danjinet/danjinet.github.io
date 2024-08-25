@@ -5,5 +5,4 @@ hi i am currently working on following projects
 - games
     - changadar
     - pyrun
-![cat](https://cdn.discordapp.com/attachments/1276969416617099295/1276969786840060120/Notes_240822_204913_4f8.jpg?ex=66cb764a&is=66ca24ca&hm=e353c083e4b5713cc377a3a60e9b5746493758553ca3eb1426665a1b0b97183a&)
-![cat](https://cdn.discordapp.com/attachments/1276939453587394671/1276970883164143738/Untitled7_20240824230951.jpg?ex=66cc200f&is=66cace8f&hm=b463336242498abe677f65c75075b6cff3a07855a4fabf1df5ddc30a86f29094&)
+![cat](https://cdn.discordapp.com/attachments/1277223395238608937/1277223621059805285/tumblr_e642b66f8548fa1485621bd82d3eacc9_af7dc108_640.gif?ex=66cc62b0&is=66cb1130&hm=e13e791ebc54934f6a47da840af5490b6cefb207d0baa86178415fb86a3f3d33&)
