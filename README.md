@@ -1,1 +1,1 @@
-![](1_ZXQifyIny_o2bFmz1BBz3A.gif)
+<img src="https://github.com/sahilbhuvad/HCR-on-CNN-architecture/blob/main/README.md" width=50% height=50%>
