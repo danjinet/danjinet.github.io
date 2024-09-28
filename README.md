@@ -45,3 +45,8 @@ Waaa, you see me. I thought I would be hidden ;p .
 <li> markdown list 2</li>
 </ul>
 </details>
+
+:::{dropdown} Dropdown Title
+:open:
+Dropdown content
+:::
