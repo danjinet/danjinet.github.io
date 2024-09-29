@@ -3,69 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookmark Your Favorite Sites</title>
+    <title>Favorite Websites</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        .bookmark-form {
-            margin-bottom: 20px;
-        }
         .bookmark-list {
-            list-style: none;
-            padding: 0;
-        }
-        .bookmark-list li {
             display: flex;
-            align-items: center;
-            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 20px;
         }
-        .bookmark-list img {
-            width: 24px;
-            height: 24px;
-            margin-right: 10px;
+        .bookmark-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 150px;
+        }
+        .bookmark-item img {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 5px;
+        }
+        .bookmark-item a {
+            text-decoration: none;
+            color: black;
+            font-size: 14px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    
-    <div class="bookmark-form">
-        <input type="url" id="website-url" placeholder="Enter website URL" required>
-        <button onclick="addBookmark()">Add Bookmark</button>
+
+    <h1>Favorite Websites</h1>
+
+    <div class="bookmark-list">
+        <!-- Bookmarks will go here -->
+        <div class="bookmark-item">
+            <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://www.google.com" alt="Google">
+            <a href="https://www.google.com" target="_blank">Google</a>
+        </div>
+        
+        <div class="bookmark-item">
+            <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://www.facebook.com" alt="Facebook">
+            <a href="https://www.facebook.com" target="_blank">Facebook</a>
+        </div>
+
+        <div class="bookmark-item">
+            <img src="https://www.google.com/s2/favicons?sz=64&domain_url=https://www.github.com" alt="GitHub">
+            <a href="https://www.github.com" target="_blank">GitHub</a>
+        </div>
+        
+        <!-- Add more links here -->
     </div>
 
-    <ul class="bookmark-list" id="bookmark-list">
-        <!-- Bookmarked websites will appear here -->
-    </ul>
-
     <script>
-        function getFavicon(url) {
-            return 'https://www.google.com/s2/favicons?sz=64&domain_url=' + url;
-        }
-
-        function addBookmark() {
-            const urlInput = document.getElementById('website-url');
-            const url = urlInput.value;
-            if (url) {
-                const faviconUrl = getFavicon(url);
-                const listItem = document.createElement('li');
-                
-                const img = document.createElement('img');
-                img.src = faviconUrl;
-                
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                link.textContent = url;
-
-                listItem.appendChild(img);
-                listItem.appendChild(link);
-                document.getElementById('bookmark-list').appendChild(listItem);
-
-                urlInput.value = ''; // Clear input field after adding
+        const bookmarkItems = document.querySelectorAll('.bookmark-item img');
+        
+        bookmarkItems.forEach(img => {
+            img.onerror = function() {
+                img.style.display = 'none';
+                img.nextElementSibling.style.fontSize = '16px';  // Increase font size if image is not available
             }
-        }
+        });
     </script>
 
 </body>
