@@ -130,3 +130,38 @@ graph TD;
         "Product B" : 30
         "Product C" : 20
         "Others" : 10
+
+
+```mermaid
+graph TD;
+    A[Start] --> B[Process]
+    B --> C[End]
+
+### 3. **Using Mermaid with Markdown Renderers**
+If you're rendering Markdown using **Static Site Generators** like **Jekyll** or **Hugo**, you may need plugins:
+- **Hugo**: Use the [Hugo Mermaid Shortcode](https://gohugo.io/hugo-modules/) or [Hugo Charts.js](https://gohugo.io/content-management/diagrams/).
+- **Jekyll**: You can use the [Jekyll Mermaid Plugin](https://github.com/jekyll/jekyll).
+
+### 4. **Browser Support**
+If you're viewing your `.md` file in a browser, you can use Mermaid.js directly by including a script in your HTML file that loads Mermaid:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mermaid Diagrams</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+</head>
+<body>
+  <pre class="mermaid">
+  graph TD;
+      A[Start] --> B[Process]
+      B --> C[End]
+  </pre>
+</body>
+</html>
