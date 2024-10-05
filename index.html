@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rainbow Pixel Grid with Larger Floating Page and Image</title>
+    <style>
+        /* Basic page reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Rainbow pixel grid background */
+        body {
+            background-image: repeating-linear-gradient(45deg, 
+                red, red 10px, 
+                orange 10px, orange 20px, 
+                yellow 20px, yellow 30px, 
+                green 30px, green 40px, 
+                blue 40px, blue 50px, 
+                indigo 50px, indigo 60px, 
+                violet 60px, violet 70px
+            );
+            background-size: 40px 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Larger floating content page with smooth hover and image */
+        .floating-page {
+            width: 80%;  /* Increased width */
+            height: 80vh;  /* Set height to take up 80% of viewport height */
+            max-width: 1200px; /* Increased max width */
+            background-color: white;
+            padding: 40px;  /* Increased padding */
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+        }
+
+        /* Adding a smooth hover effect */
+        .floating-page:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Adding a slightly transparent border to see a portion of the background */
+        .floating-page:before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            bottom: -10px;
+            left: -10px;
+            border: 10px solid rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            z-index: -1;
+        }
+
+        /* Image added to the floating page */
+        .floating-page img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 30px;  /* Increased font size */
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        ul li {
+            background-color: #f0f0f0;
+            padding: 15px; /* Increased padding for list items */
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        ul li:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="floating-page">
+        <!-- Image from the internet -->
+        <img src="https://via.placeholder.com/1200x600" alt="Sample Image">
+        
+        <h1>Article Titles</h1>
+        <ul>
+            <li>Understanding Web Development Basics</li>
+            <li>How to Design Responsive Websites</li>
+            <li>CSS Grid vs Flexbox: A Comprehensive Guide</li>
+            <li>JavaScript Tips for Beginners</li>
+            <li>Introduction to Frontend Frameworks</li>
+        </ul>
+    </div>
+
+</body>
+</html> 
