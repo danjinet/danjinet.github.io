@@ -25,11 +25,74 @@
 <body>
 
     <div id="content">
-        This is the first line of content.<br>
-        This is the second line of content.<br>
-        This is some hidden content that will be copied.<br>
-        More hidden content here.<br>
-        Even more hidden content to copy.
+Below is a compact example of how to **write** and **read** CSV, text, and JSON files in Apache Spark using Scala. I'll provide separate code snippets for each file format, assuming you have a Spark session initialized.
+
+### **Writing and Reading CSV, Text, and JSON Files in Apache Spark**
+
+#### **1. Write and Read CSV File**
+```scala
+// Writing a DataFrame to a CSV file
+val csvData = Seq(("James", "Smith", 30), ("Michael", "Rose", 45))
+val csvDF = csvData.toDF("first_name", "last_name", "age")
+csvDF.write.option("header", "true").csv("output/csv_data.csv")
+
+// Reading a CSV file into a DataFrame
+val readCsvDF = spark.read.option("header", "true").csv("output/csv_data.csv")
+readCsvDF.show()
+```
+
+#### **2. Write and Read Text File**
+```scala
+// Writing a DataFrame to a text file
+val textData = Seq("Hello, World!", "Apache Spark is great!")
+val textDF = textData.toDF("text")
+textDF.write.text("output/text_data.txt")
+
+// Reading a text file into a DataFrame
+val readTextDF = spark.read.text("output/text_data.txt")
+readTextDF.show(false)
+```
+
+#### **3. Write and Read JSON File**
+```scala
+// Writing a DataFrame to a JSON file
+val jsonData = Seq(("Alice", 29), ("Bob", 34))
+val jsonDF = jsonData.toDF("name", "age")
+jsonDF.write.json("output/json_data.json")
+
+// Reading a JSON file into a DataFrame
+val readJsonDF = spark.read.json("output/json_data.json")
+readJsonDF.show()
+```
+
+### **Execution in PowerShell**
+
+To run the above Scala code inside PowerShell, follow these steps:
+
+1. **Create a Scala File**: Save the above code snippets in a file named `SparkFileOperations.scala`.
+
+2. **Start Spark Shell**: Open PowerShell and navigate to your Spark installation directory, then run:
+   ```powershell
+   spark-shell
+   ```
+
+3. **Load the Scala File**:
+   In the Spark shell, load the Scala file using:
+   ```scala
+   :load SparkFileOperations.scala
+   ```
+
+4. **Run the Code**: After loading the file, the code will execute, writing and reading the respective files in the `output` directory.
+
+### **Notes**
+- Make sure you have the `output` directory created or Spark will throw an error when trying to write files. You can create it manually in PowerShell:
+   ```powershell
+   mkdir output
+   ```
+
+- Adjust the paths if you're using a different directory structure.
+
+Feel free to ask if you need any more examples or further clarification!
     </div>
 
     <button id="copyButton">Copy Full Content</button>
