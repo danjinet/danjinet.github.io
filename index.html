@@ -23,69 +23,9 @@
 <body>
 
     <div id="content">
-
-<p>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Copy Content Example</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #content {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-        button {
-            padding: 10px 15px;
-            font-size: 16px;
-        }
-    </style>
-</head>
-<body>
-
-    <div id="content">This is the content to copy.</div>
-    <button id="copyButton">Copy Content</button>
-
-    <script>
-        document.getElementById('copyButton').onclick = function() {
-            const content = document.getElementById('content');
-            const range = document.createRange();
-            range.selectNodeContents(content);
-            const selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-            document.execCommand('copy');
-            selection.removeAllRanges(); // Deselect the content
-            alert('Content copied to clipboard!');
-        };
-    </script>
-\---
-</body>
-</html>
-
-</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
+        This is the content to copy.
+    </div>
+    
     <button id="copyButton">Copy Content</button>
 
     <script>
