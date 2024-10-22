@@ -13,8 +13,9 @@
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 10px;
-            max-height: 50px; /* Adjust to show only two lines */
-            overflow: hidden;
+            max-height: 300px; /* Adjust height as needed */
+            overflow: auto;
+            white-space: pre; /* Preserve whitespace */
         }
         button {
             padding: 10px 15px;
@@ -24,9 +25,8 @@
 </head>
 <body>
 
-    <div id="content">
-        
-
+    <div id="content" contenteditable="true">
+      
 
 
 
@@ -562,38 +562,32 @@ object DataFrameOperationsExample {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     </div>
 
     <button id="copyButton">Copy Full Content</button>
 
     <script>
-        document.getElementById('copyButton').onclick = function() {
+        document.getElementById('copyButton').addEventListener('click', function() {
             const content = document.getElementById('content');
+
+            // Select the content
+            const selection = window.getSelection();
             const range = document.createRange();
             range.selectNodeContents(content);
-            const selection = window.getSelection();
             selection.removeAllRanges();
             selection.addRange(range);
-            document.execCommand('copy');
-            selection.removeAllRanges(); // Deselect the content
-        };
-    </script>
 
+            // Copy to clipboard
+            try {
+                document.execCommand('copy');
+                alert('Content copied to clipboard!');
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+            }
+
+            // Deselect the content
+            selection.removeAllRanges();
+        });
+    </script>
 </body>
 </html>
