@@ -1,0 +1,514 @@
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+// date & time function 
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+import org.apache.spark.sql.functions._
+import spark.implicits._
+
+// 1. current_date() and date_format()
+Seq("2024-08-20").toDF("input")
+  .select(current_date().as("current_date"))
+  .show(false)
+
+Seq("2024-08-20").toDF("input")
+  .select(date_format(col("input"), "MM-dd-yyyy").as("Formatted Date"))
+  .show(false)
+
+// 2. to_date()
+Seq("08/20/2024").toDF("input")
+  .select(col("input"), to_date(col("input"), "MM/dd/yyyy").as("to_date"))
+  .show(false)
+
+// 3. datediff()
+Seq("2020-01-20", "2024-08-20", "2025-01-20").toDF("input")
+  .select(col("input"), current_date(), datediff(current_date(), col("input")).as("diff"))
+  .show(false)
+
+// 4. months_between()
+Seq("2020-01-20", "2024-08-20", "2025-01-20").toDF("date")
+  .select(col("date"), current_date(), months_between(current_date(), col("date")).as("months_between"))
+  .show(false)
+
+// 5. add_months(), date_add(), date_sub()
+Seq("2020-01-20", "2024-08-20", "2025-01-20").toDF("input")
+  .select(
+    col("input"),
+    add_months(col("input"), 3).as("add_months"),
+    add_months(col("input"), -3).as("sub_months"),
+    date_add(col("input"), 4).as("date_add"),
+    date_sub(col("input"), 4).as("date_sub")
+  )
+  .show(false)
+
+// 6. year(), month(), dayofweek(), dayofmonth(), dayofyear(), next_day(), weekofyear()
+Seq("2020-01-20", "2024-08-20", "2025-01-20").toDF("input")
+  .select(
+    col("input"),
+    year(col("input")).as("year"),
+    month(col("input")).as("month"),
+    dayofweek(col("input")).as("day_of_week"),
+    dayofmonth(col("input")).as("day_of_month"),
+    dayofyear(col("input")).as("day_of_year"),
+    next_day(col("input"), "Sunday").as("next_sunday"),
+    weekofyear(col("input")).as("week_of_year")
+  )
+  .show(false)
+
+// 7. current_timestamp()
+val df = Seq((1)).toDF("seq")
+val curDate = df.withColumn("current_date", current_date().as("current_date"))
+                .withColumn("current_timestamp", current_timestamp().as("current_timestamp"))
+
+curDate.show(false)
+
+// 8. hour(), minute(), and second()
+Seq(
+  "2024-07-01 13:00:33.765",
+  "2024-06-24 02:01:19.000",
+  "2024-11-16 06:44:55.406",
+  "2024-11-10 16:02:52.936"
+).toDF("input_timestamp")
+  .withColumn("hour", hour(col("input_timestamp")))
+  .withColumn("minute", minute(col("input_timestamp")))
+  .withColumn("second", second(col("input_timestamp")))
+  .show(false)
+
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+// avro
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+import java.io.File
+
+object AvroExample {
+
+  def main(args: Array[String]): Unit = {
+
+    // Step 1: Create Spark Session
+    val spark = SparkSession.builder()
+      .appName("Avro Example")
+      .master("local[*]")  // Running Spark in local mode
+      .getOrCreate()
+
+    import spark.implicits._
+
+    // Step 2: Create a sample DataFrame
+    val data = Seq(
+      ("James", "Smith", "M", 3000),
+      ("Michael", "Rose", "M", 4000),
+      ("Maria", "Jones", "F", 3500)
+    )
+
+    val columns = Seq("firstname", "lastname", "gender", "salary")
+    val df = data.toDF(columns: _*)
+
+    // Step 3: Write the DataFrame to a local Avro file
+    df.write
+      .format("avro")
+      .save("/path/to/local/avro_files/person.avro")
+
+    // Step 4: Read the Avro file back into a DataFrame
+    val readDF = spark.read
+      .format("avro")
+      .load("/path/to/local/avro_files/person.avro")
+
+    // Step 5: Display the DataFrame content
+    readDF.show()
+
+    // Optional: Working with a schema from a local .avsc file
+    // (Make sure you have the Avro schema file saved locally)
+    val schemaFilePath = "/path/to/local/avro_files/person.avsc"
+    if (new File(schemaFilePath).exists()) {
+      println(s"Schema file found at $schemaFilePath. Reading file with schema.")
+
+      // Load the schema
+      import org.apache.avro.Schema
+      val schema = new Schema.Parser().parse(new File(schemaFilePath))
+
+      // Read the Avro file with the schema
+      val dfWithSchema = spark.read
+        .format("avro")
+        .load("/path/to/local/avro_files/person.avro")
+
+      // Display the data read with schema
+      dfWithSchema.show()
+    } else {
+      println(s"Schema file not found at $schemaFilePath. Skipping schema read.")
+    }
+
+    // Step 6: Stop the Spark session
+    spark.stop()
+  }
+}
+
+//  +---+-------+--------+--------+------------+--------+-----+-------+ 
+//  hbase
+//  +---+-------+--------+--------+------------+--------+-----+-------+ 
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.execution.datasources.hbase.HBaseTableCatalog
+
+object HBaseSparkExample {
+
+  // Define Employee case class
+  case class Employee(
+    key: String, 
+    fName: String, 
+    lName: String, 
+    mName: String, 
+    addressLine: String, 
+    city: String, 
+    state: String, 
+    zipCode: String
+  )
+
+  // Define HBase catalog to map DataFrame columns to HBase column families
+  def catalog = s"""{
+    "table": {"namespace": "default", "name": "employee"},
+    "rowkey": "key",
+    "columns": {
+      "key": {"cf": "rowkey", "col": "key", "type": "string"},
+      "fName": {"cf": "person", "col": "firstName", "type": "string"},
+      "lName": {"cf": "person", "col": "lastName", "type": "string"},
+      "mName": {"cf": "person", "col": "middleName", "type": "string"},
+      "addressLine": {"cf": "address", "col": "addressLine", "type": "string"},
+      "city": {"cf": "address", "col": "city", "type": "string"},
+      "state": {"cf": "address", "col": "state", "type": "string"},
+      "zipCode": {"cf": "address", "col": "zipCode", "type": "string"}
+    }
+  }""".stripMargin
+
+  def main(args: Array[String]): Unit = {
+
+    // Step 1: Create Spark Session
+    val spark = SparkSession.builder()
+      .appName("HBase Spark Example")
+      .master("local[*]") // Running Spark locally
+      .getOrCreate()
+
+    import spark.implicits._
+
+    // Step 2: Create sample employee data
+    val data = Seq(
+      Employee("1", "Abby", "Smith", "K", "3456 Main", "Orlando", "FL", "45235"),
+      Employee("2", "Amaya", "Williams", "L", "123 Orange", "Newark", "NJ", "27656"),
+      Employee("3", "Alchemy", "Davis", "P", "Warmers", "Sanjose", "CA", "34789")
+    )
+
+    // Step 3: Convert the sequence to a DataFrame
+    val df = spark.sparkContext.parallelize(data).toDF
+
+    // Step 4: Write DataFrame to HBase table
+    df.write
+      .options(Map(
+        HBaseTableCatalog.tableCatalog -> catalog,
+        HBaseTableCatalog.newTable -> "4" // Create table with 4 regions
+      ))
+      .format("org.apache.spark.sql.execution.datasources.hbase")
+      .save()
+
+    // Step 5: Read the data back from HBase into a DataFrame
+    val hbaseDF = spark.read
+      .options(Map(HBaseTableCatalog.tableCatalog -> catalog))
+      .format("org.apache.spark.sql.execution.datasources.hbase")
+      .load()
+
+    // Step 6: Show the DataFrame read from HBase
+    hbaseDF.show(false)
+
+    // Step 7: Stop the Spark session
+    spark.stop()
+  }
+}
+
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+// import
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkConf
+
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+// Read external files 
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+
+import org.apache.spark.sql.SparkSession
+
+object FileReadWriteExample {
+  def main(args: Array[String]): Unit = {
+    // Initialize Spark Session
+    val spark = SparkSession.builder()
+      .appName("File Read Write Example")
+      .master("local[*]") // Run locally with all cores
+      .getOrCreate()
+
+    import spark.implicits._
+
+    // =====================
+    // 1. Reading CSV File
+    // =====================
+    val csvFilePath = "/path/to/your/input.csv"
+    val csvDF = spark.read
+      .option("header", "true") // Assume the CSV has a header row
+      .option("inferSchema", "true") // Infer the schema (data types)
+      .csv(csvFilePath)
+
+    println("CSV Data:")
+    csvDF.show()
+
+    // =====================
+    // 2. Reading TXT File
+    // =====================
+    val txtFilePath = "/path/to/your/input.txt"
+    val txtDF = spark.read
+      .text(txtFilePath) // Read the text file
+
+    println("TXT Data:")
+    txtDF.show(false) // Show text file without truncation
+
+    // =====================
+    // 3. Reading JSON File
+    // =====================
+    val jsonFilePath = "/path/to/your/input.json"
+    val jsonDF = spark.read
+      .json(jsonFilePath) // Read JSON file
+
+    println("JSON Data:")
+    jsonDF.show()
+
+    // =====================
+    // 4. Writing CSV Data
+    // =====================
+    val outputCSVPath = "/path/to/output/csv"
+    csvDF.coalesce(1) // Combine into one partition to write a single file
+      .write
+      .option("header", "true") // Include header
+      .csv(outputCSVPath)
+
+    // =====================
+    // 5. Writing TXT Data
+    // =====================
+    val outputTXTPath = "/path/to/output/txt"
+    txtDF.write
+      .text(outputTXTPath)
+
+    // =====================
+    // 6. Writing JSON Data
+    // =====================
+    val outputJSONPath = "/path/to/output/json"
+    jsonDF.write
+      .json(outputJSONPath)
+
+    // =====================
+    // 7. Convert CSV to Excel using Python (suggestion)
+    // =====================
+    // This step cannot be performed directly in Scala/Spark.
+    // You can use Python's pandas library to convert the CSV to Excel:
+    // 
+    // import pandas as pd
+    // df = pd.read_csv('/path/to/output/csv/part-00000-xxxx.csv')
+    // df.to_excel('/path/to/output/excel/output.xlsx', index=False)
+    // 
+    // Use the above Python snippet to convert CSV to Excel using pandas.
+    
+    // Stop Spark Session
+    spark.stop()
+  }
+}
+
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+//  rdd & operations on it 
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+
+import org.apache.spark.sql.SparkSession
+
+object RDDOperationsExample {
+  def main(args: Array[String]): Unit = {
+    // Initialize Spark Session
+    val spark = SparkSession.builder()
+      .appName("RDD Operations Example")
+      .master("local[*]") // Run locally with all cores
+      .getOrCreate()
+
+    // Create SparkContext from SparkSession
+    val sc = spark.sparkContext
+
+    // =====================
+    // 1. Creating RDD
+    // =====================
+    // Create an RDD from a collection (list of numbers)
+    val numbers = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    val numberRDD = sc.parallelize(numbers)
+
+    // =====================
+    // 2. RDD Transformations
+    // =====================
+
+    // 2.1 Map Transformation: Multiply each number by 2
+    val mappedRDD = numberRDD.map(x => x * 2)
+
+    // 2.2 Filter Transformation: Keep only even numbers
+    val filteredRDD = numberRDD.filter(x => x % 2 == 0)
+
+    // 2.3 FlatMap Transformation: Create an RDD of elements where each number produces a range from 1 to that number
+    val flatMappedRDD = numberRDD.flatMap(x => 1 to x)
+
+    // 2.4 Union Transformation: Combine two RDDs
+    val moreNumbers = List(11, 12, 13, 14, 15)
+    val moreNumbersRDD = sc.parallelize(moreNumbers)
+    val unionRDD = numberRDD.union(moreNumbersRDD)
+
+    // 2.5 Distinct Transformation: Remove duplicate elements
+    val distinctRDD = unionRDD.distinct()
+
+    // 2.6 Sample Transformation: Randomly sample data from the RDD
+    val sampledRDD = numberRDD.sample(withReplacement = false, fraction = 0.5)
+
+    // =====================
+    // 3. RDD Actions
+    // =====================
+
+    // 3.1 Collect Action: Collect the RDD elements into an array
+    val collected = numberRDD.collect()
+    println("Collected RDD: " + collected.mkString(", "))
+
+    // 3.2 Count Action: Count the number of elements in the RDD
+    val count = numberRDD.count()
+    println("Count of elements: " + count)
+
+    // 3.3 Reduce Action: Sum all elements of the RDD
+    val sum = numberRDD.reduce((a, b) => a + b)
+    println("Sum of elements: " + sum)
+
+    // 3.4 Take Action: Take the first 3 elements
+    val taken = numberRDD.take(3)
+    println("First 3 elements: " + taken.mkString(", "))
+
+    // 3.5 First Action: Get the first element of the RDD
+    val firstElement = numberRDD.first()
+    println("First element: " + firstElement)
+
+    // 3.6 CountByValue Action: Count occurrences of each unique element
+    val countByValue = numberRDD.countByValue()
+    println("Count by value: " + countByValue)
+
+    // =====================
+    // 4. Additional RDD Operations
+    // =====================
+
+    // 4.1 GroupBy: Group numbers by whether they are even or odd
+    val groupedRDD = numberRDD.groupBy(x => x % 2 == 0)
+    groupedRDD.collect().foreach {
+      case (key, value) => println(s"Key: $key, Values: ${value.mkString(", ")}")
+    }
+
+    // 4.2 ReduceByKey (Key-Value RDD): Sum values by key
+    val pairRDD = sc.parallelize(Seq(("A", 1), ("B", 2), ("A", 3), ("B", 4)))
+    val reducedByKeyRDD = pairRDD.reduceByKey(_ + _)
+    println("Reduced by key:")
+    reducedByKeyRDD.collect().foreach(println)
+
+    // Stop Spark Session
+    spark.stop()
+  }
+}
+
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+// DataFrame 
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+
+import org.apache.spark.sql.{SparkSession, DataFrame}
+import org.apache.spark.sql.functions._
+
+object DataFrameOperationsExample {
+  def main(args: Array[String]): Unit = {
+    // Initialize Spark Session
+    val spark = SparkSession.builder()
+      .appName("DataFrame Operations Example")
+      .master("local[*]") // Run locally with all cores
+      .getOrCreate()
+
+    // =====================
+    // 1. Creating DataFrame
+    // =====================
+    // Create a DataFrame from a sequence of case class objects
+    case class Employee(id: Int, name: String, age: Int, salary: Double)
+
+    val employees = Seq(
+      Employee(1, "John Doe", 30, 60000.0),
+      Employee(2, "Jane Smith", 40, 75000.0),
+      Employee(3, "Sam Brown", 35, 50000.0),
+      Employee(4, "Sara White", 28, 72000.0),
+      Employee(5, "Mike Johnson", 45, 90000.0)
+    )
+
+    import spark.implicits._
+    val employeeDF: DataFrame = employees.toDF()
+
+    // Show the DataFrame
+    println("Original DataFrame:")
+    employeeDF.show()
+
+    // =====================
+    // 2. DataFrame Transformations
+    // =====================
+
+    // 2.1 Select Columns: Select specific columns
+    val selectedDF = employeeDF.select("name", "salary")
+    println("Selected Columns (Name and Salary):")
+    selectedDF.show()
+
+    // 2.2 Filter Rows: Filter rows based on a condition
+    val filteredDF = employeeDF.filter($"age" > 30)
+    println("Employees with age greater than 30:")
+    filteredDF.show()
+
+    // 2.3 Add New Column: Add a new column to the DataFrame
+    val updatedDF = employeeDF.withColumn("bonus", $"salary" * 0.1)
+    println("DataFrame with Bonus Column:")
+    updatedDF.show()
+
+    // 2.4 Rename Column: Rename a column
+    val renamedDF = employeeDF.withColumnRenamed("salary", "annual_salary")
+    println("Renamed Salary to Annual Salary:")
+    renamedDF.show()
+
+    // 2.5 Group By and Aggregate: Group by age and calculate average salary
+    val groupedDF = employeeDF.groupBy("age").agg(avg("salary").alias("average_salary"))
+    println("Average Salary by Age:")
+    groupedDF.show()
+
+    // =====================
+    // 3. DataFrame Actions
+    // =====================
+
+    // 3.1 Collect: Collect all rows to the driver
+    val collected = employeeDF.collect()
+    println("Collected Rows:")
+    collected.foreach(println)
+
+    // 3.2 Count: Count the number of rows
+    val count = employeeDF.count()
+    println(s"Total number of employees: $count")
+
+    // 3.3 Show: Show a specific number of rows
+    println("First 3 employees:")
+    employeeDF.show(3)
+
+    // 3.4 Describe: Get summary statistics for numeric columns
+    println("Summary Statistics:")
+    employeeDF.describe("age", "salary").show()
+
+    // 3.5 First: Get the first row
+    val firstRow = employeeDF.first()
+    println(s"First Employee: $firstRow")
+
+    // Stop Spark Session
+    spark.stop()
+  }
+}
+
+// +---+-------+--------+--------+------------+--------+-----+-------+ 
+//
+// +---+-------+--------+--------+------------+--------+-----+-------+
