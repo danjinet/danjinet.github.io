@@ -3,26 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Download Text File</title>
+    <title>Download File</title>
 </head>
 <body>
 
-    <button id="downloadButton">Download Text File</button>
-
-    <script>
-        document.getElementById('downloadButton').addEventListener('click', function() {
-            const textContent = "This is the content of your text file.\nYou can add more lines here.\nThis file is created on click.";
-            const blob = new Blob([textContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'cheat_241023_015542.txt'; // Set the name of the downloaded file here
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url); // Free up memory
-        });
-    </script>
+    <a href="sahil047.txt" download="sahil047.txt">Download sahil047.txt</a>
 
 </body>
 </html>
