@@ -13,6 +13,8 @@
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 10px;
+            max-height: 50px; /* Adjust to show only two lines */
+            overflow: hidden;
         }
         button {
             padding: 10px 15px;
@@ -23,24 +25,14 @@
 <body>
 
     <div id="content">
-        import This is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy ContentThis is the content to copy.
-Copy Content
+        This is the first line of content.<br>
+        This is the second line of content.<br>
+        This is some hidden content that will be copied.<br>
+        More hidden content here.<br>
+        Even more hidden content to copy.
     </div>
-    
-    <button id="copyButton">Copy Content</button>
+
+    <button id="copyButton">Copy Full Content</button>
 
     <script>
         document.getElementById('copyButton').onclick = function() {
@@ -52,7 +44,7 @@ Copy Content
             selection.addRange(range);
             document.execCommand('copy');
             selection.removeAllRanges(); // Deselect the content
-            alert('Content copied to clipboard!');
+            alert('Full content copied to clipboard!');
         };
     </script>
 
